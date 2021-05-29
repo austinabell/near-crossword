@@ -30,32 +30,45 @@ pub struct Crossword {
 
 #[near_bindgen]
 impl Crossword {
-    pub fn submit_solution(&mut self, new_public_key: Base58PublicKey) {
-        let solver = env::signer_account_pk();
+    pub fn submit_solution(&mut self, new_public_key: Base58PublicKey) { // TODO: rename to user_generated_pk?
+        let solver = env::signer_account_pk(); // TODO: rename to answer_pk?
         // check to see if the env::public key from signer is in the puzzles
         // see if it's already solved…
-        let entry = self
+        let puzzle = self
             .puzzles
             .get_mut(&solver)
             .expect("Not a correct public key to solve puzzle");
 
         // batch action of removing that public key and adding the user's public key
-        entry.status = match entry.status {
+        puzzle.status = match puzzle.status {
             PuzzleStatus::Unsolved => PuzzleStatus::Solved {
                 solver: new_public_key.clone().into(),
             },
             _ => {
+                // is it a good practice to panic here? It generates errors that are hard to read on naj side.
                 env::panic(b"puzzle is already solved");
             }
         };
+
+        // TODO: why are we copy pasting new_puplic_key to `solver` and then doing nothing?
 
         log!(
             "Puzzle solved, new public key: {}",
             String::from(&new_public_key)
         );
+
+        //TODO: add new function call key for claim_reward
+
+        //TODO: delete old function call key?
     }
     
-    // TODO claim reward functionality
+    pub fn claim_reward(&mut self, _reciever_acc_id: String) { //TODO: is it ok to have reciever_acc_id for now?
+        // what puzzle are we solving?
+        
+        // TODO: 
+        
+        // TODO: delete function call key
+    }
 
     // Puzzle creator provides `key` that's the answer
     #[payable]
