@@ -11,7 +11,7 @@ near_sdk::setup_alloc!();
 #[derive(BorshDeserialize, BorshSerialize)]
 pub enum PuzzleStatus {
     Unsolved,
-    Solved { solver: PublicKey },
+    Solved { solver_pk: PublicKey },
     Claimed { memo: String },
 }
 
@@ -30,31 +30,28 @@ pub struct Crossword {
 
 #[near_bindgen]
 impl Crossword {
-    pub fn submit_solution(&mut self, new_public_key: Base58PublicKey) { // TODO: rename to user_generated_pk?
-        let solver = env::signer_account_pk(); // TODO: rename to answer_pk?
+    pub fn submit_solution(&mut self, solver_pk: Base58PublicKey) {
+        let answer_pk = env::signer_account_pk();
         // check to see if the env::public key from signer is in the puzzles
         // see if it's already solved…
         let puzzle = self
             .puzzles
-            .get_mut(&solver)
+            .get_mut(&answer_pk)
             .expect("Not a correct public key to solve puzzle");
 
         // batch action of removing that public key and adding the user's public key
         puzzle.status = match puzzle.status {
             PuzzleStatus::Unsolved => PuzzleStatus::Solved {
-                solver: new_public_key.clone().into(),
+                solver_pk: solver_pk.clone().into(),
             },
             _ => {
-                // is it a good practice to panic here? It generates errors that are hard to read on naj side.
                 env::panic(b"puzzle is already solved");
             }
         };
 
-        // TODO: why are we copy pasting new_puplic_key to `solver` and then doing nothing?
-
         log!(
             "Puzzle solved, new public key: {}",
-            String::from(&new_public_key)
+            String::from(&solver_pk)
         );
 
         //TODO: add new function call key for claim_reward
