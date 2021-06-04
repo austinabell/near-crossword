@@ -32,16 +32,17 @@ pub struct Crossword {
 impl Crossword {
     pub fn submit_solution(&mut self, solver_pk: Base58PublicKey) {
         let answer_pk = env::signer_account_pk();
-        // check to see if the env::public key from signer is in the puzzles
-        // see if it's already solved…
+        /* check to see if the answer_pk from signer is in the puzzles */
         let puzzle = self
             .puzzles
             .get_mut(&answer_pk)
             .expect("Not a correct public key to solve puzzle");
 
-        // batch action of removing that public key and adding the user's public key
+        /* check if the puzzle is already solved, if it's not solved - make batch action of
+        removing that public key and adding the user's public key */
         puzzle.status = match puzzle.status {
             PuzzleStatus::Unsolved => PuzzleStatus::Solved {
+                // TODO: why to do this? What it gives us? Why not just set PuzzleStatus::Solved?
                 solver_pk: solver_pk.clone().into(),
             },
             _ => {
@@ -49,21 +50,24 @@ impl Crossword {
             }
         };
 
-        log!(
-            "Puzzle solved, new public key: {}",
-            String::from(&solver_pk)
+        log!("Puzzle solved, solever pk: {}", String::from(&solver_pk));
+
+        /* add new function call key for claim_reward */
+        Promise::new(env::current_account_id()).add_access_key(
+            solver_pk.into(),
+            250000000000000000000000,
+            env::current_account_id(),
+            b"claim_reward".to_vec(),
         );
 
-        //TODO: add new function call key for claim_reward
-
-        //TODO: delete old function call key?
+        /* delete old funciton call key*/
+        Promise::new(env::current_account_id()).delete_key(answer_pk);
     }
-    
-    pub fn claim_reward(&mut self, _reciever_acc_id: String) { //TODO: is it ok to have reciever_acc_id for now?
-        // what puzzle are we solving?
-        
-        // TODO: 
-        
+    pub fn claim_reward(&mut self, _reciever_acc_id: String) {
+        // TODO: is it ok to have reciever_acc_id for now?
+        // TODO: what puzzle are we solving?
+
+        // TODO:
         // TODO: delete function call key
     }
 
