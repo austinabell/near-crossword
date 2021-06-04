@@ -42,7 +42,6 @@ impl Crossword {
         removing that public key and adding the user's public key */
         puzzle.status = match puzzle.status {
             PuzzleStatus::Unsolved => PuzzleStatus::Solved {
-                // TODO: why to do this? What it gives us? Why not just set PuzzleStatus::Solved?
                 solver_pk: solver_pk.clone().into(),
             },
             _ => {
@@ -64,10 +63,10 @@ impl Crossword {
         Promise::new(env::current_account_id()).delete_key(answer_pk);
     }
     pub fn claim_reward(&mut self, _reciever_acc_id: String) {
-        // TODO: is it ok to have reciever_acc_id for now?
-        // TODO: what puzzle are we solving?
-
-        // TODO:
+        // TODO: check if puzzle is in the map
+        // TODO: check if status is solved
+        // TODO: change status of the puzzle to claimed
+        // TODO: send money to reciever_acc_id
         // TODO: delete function call key
     }
 
