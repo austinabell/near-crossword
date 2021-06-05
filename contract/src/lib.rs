@@ -18,7 +18,7 @@ pub enum PuzzleStatus {
 #[derive(BorshDeserialize, BorshSerialize)]
 pub struct Puzzle {
     status: PuzzleStatus,
-    value: Balance,
+    reward: Balance,
     creator: AccountId,
 }
 
@@ -49,7 +49,11 @@ impl Crossword {
             }
         };
 
-        log!("Puzzle solved, solever pk: {}", String::from(&solver_pk));
+        log!(
+            "Puzzle with pk {:?} solved, solever pk: {}",
+            answer_pk,
+            String::from(&solver_pk)
+        );
 
         /* add new function call key for claim_reward */
         Promise::new(env::current_account_id()).add_access_key(
@@ -62,12 +66,36 @@ impl Crossword {
         /* delete old funciton call key*/
         Promise::new(env::current_account_id()).delete_key(answer_pk);
     }
-    pub fn claim_reward(&mut self, _reciever_acc_id: String) {
-        // TODO: check if puzzle is in the map
-        // TODO: check if status is solved
-        // TODO: change status of the puzzle to claimed
-        // TODO: send money to reciever_acc_id
-        // TODO: delete function call key
+    pub fn claim_reward(&mut self, reciever_acc_id: String, memo: String) {
+        let signer_pk = env::signer_account_pk();
+        /* check to see if signer_pk is in the puzzles keys */
+        let puzzle = self
+            .puzzles
+            .get_mut(&signer_pk)
+            .expect("Not a correct public key to solve puzzle");
+
+        /* check if puzzle is already solved and set `Claimed` status */
+        puzzle.status = match puzzle.status {
+            PuzzleStatus::Solved { solver_pk: _ } => PuzzleStatus::Claimed {
+                memo: memo.clone().into(),
+            },
+            _ => {
+                env::panic(b"puzzle should have `Solved` status to be claimed");
+            }
+        };
+
+        Promise::new(reciever_acc_id.clone()).transfer(puzzle.reward);
+
+        log!(
+            "Puzzle with pk: {:?} claimed, reciever: {}, memo: {}, reward claimed: {}",
+            signer_pk,
+            reciever_acc_id,
+            memo,
+            puzzle.reward
+        );
+
+        /* delete funciton call key*/
+        Promise::new(env::current_account_id()).delete_key(signer_pk);
     }
 
     /* Puzzle creator provides `answer_pk`, it's a pk that can be generated
@@ -81,7 +109,7 @@ impl Crossword {
             answer_pk.clone(),
             Puzzle {
                 status: PuzzleStatus::Unsolved,
-                value: value_transfered,
+                reward: value_transfered,
                 creator,
             },
         );
