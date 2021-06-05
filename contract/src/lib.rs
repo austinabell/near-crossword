@@ -70,14 +70,15 @@ impl Crossword {
         // TODO: delete function call key
     }
 
-    // Puzzle creator provides `key` that's the answer
+    /* Puzzle creator provides `answer_pk`, it's a pk that can be generated
+    from crossword answer (seed phraze) */
     #[payable]
-    pub fn new_puzzle(&mut self, key: Base58PublicKey) {
+    pub fn new_puzzle(&mut self, answer_pk: Base58PublicKey) {
         let value_transfered = env::attached_deposit();
         let creator = env::predecessor_account_id();
-        let key = PublicKey::from(key);
+        let answer_pk = PublicKey::from(answer_pk);
         let existing = self.puzzles.insert(
-            key.clone(),
+            answer_pk.clone(),
             Puzzle {
                 status: PuzzleStatus::Unsolved,
                 value: value_transfered,
@@ -87,10 +88,9 @@ impl Crossword {
 
         assert!(existing.is_none(), "Puzzle with that key already exists");
         Promise::new(env::current_account_id()).add_access_key(
-            key,
+            answer_pk,
             250000000000000000000000,
             env::current_account_id(),
-            // * Strange API for it to be cs names
             b"submit_solution".to_vec(),
         );
     }
