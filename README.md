@@ -12,7 +12,7 @@ How to play with this contract
    near generate-key randomAccountId.testnet --seedPhrase='many clever words'
    ```
 
-   Now this key pair will be store on your machin under `~/.near-credentials/testnet/randomAccountId.json`
+   Now this key pair will be store on your machine under `~/.near-credentials/testnet/randomAccountId.json`
 
 5. Now we should add your puzzle to our contract. To do that run
    
@@ -25,9 +25,9 @@ How to play with this contract
       - `accountId` - your existing testnet accountId (you can create one at https://wallet.testnet.near.org/)
       - `deposit` - reword for the person who will solve this puzzle
    
-   After this call your puzzle will be added to the NEAR Crossword contract. Share your Crossword with frieds, the person who will be able to solve it will be able to generate the same key pair and get the reward. Let's do that in the following steps.
+   After this call your puzzle will be added to the NEAR Crossword contract. Share your Crossword with friends, the person who will be able to solve it will be able to generate the same key pair and get the reward. Let's do that in the following steps.
 
-6. Let's pretend that we have solved the puzzle and generated the very same key pair. This time it should be stored at `~/.near-credentials/testnet/<contract-id>.json`. We are using `<contract-id>` here because in the next step we will nedd to sign transaction with this acc.
+6. Let's pretend that we have solved the puzzle and generated the very same key pair. This time it should be stored at `~/.near-credentials/testnet/<contract-id>.json`. We are using `<contract-id>` here because in the next step we will need to sign transaction with this acc.
 
 ```bash
 near generate-key <crossword-contract-id> --seedPhrase='many clever words'
@@ -38,7 +38,6 @@ Also, we need to have another key that will be used later to get the reward. Let
 ```bash
 near generate-key keyToGetTheReward.testnet
 ```
-
 
 7. Let's call `submit_solution` function to solve this puzzle.
 
@@ -59,11 +58,10 @@ cp ~/.near-credentials/testnet/keyToGetTheReward.testnet.json ~/.near-credential
 And now we can claim our reward:
 
 ```bash
-near call <contract-id> claim_reward '{"reciever_acc_id":"<reciever-acc>", "memo":"Victory!"}' --accountId=<contract-id>
+near call <contract-id> claim_reward '{"receiver_acc_id":"<receiver-acc>", "memo":"Victory!"}' --accountId=<contract-id>
 ```
 
 //TODO: last call gives me `ExecutionError: "Smart contract panicked: panicked at 'Not a correct public key to solve puzzle', src/lib.rs:75:14"`
-
 
 This [React] app was initialized with [create-near-app]
 
@@ -81,7 +79,6 @@ Now you'll have a local development environment backed by the NEAR TestNet!
 
 Go ahead and play with the app and the code. As you make code changes, the app will automatically reload.
 
-
 Exploring The Code
 ==================
 
@@ -95,12 +92,10 @@ Exploring The Code
    code gets tested with [jest]. You can run both of these at once with `yarn
    run test`.
 
-
 Deploy
 ======
 
-Every smart contract in NEAR has its [own associated account][NEAR accounts]. When you run `yarn dev`, your smart contract gets deployed to the live NEAR TestNet with a throwaway account. When you're ready to make it permanent, here's how.
-
+Every smart contract in NEAR has its [own associated account][NEAR accounts]. When you run `yarn dev`, your smart contract gets deployed to NEAR TestNet with a throwaway account. When you're ready to make it permanent, here's how.
 
 Step 0: Install near-cli (optional)
 -------------------------------------
@@ -112,7 +107,6 @@ Step 0: Install near-cli (optional)
 Or, if you'd rather use the locally-installed version, you can prefix all `near` commands with `npx`
 
 Ensure that it's installed with `near --version` (or `npx near --version`)
-
 
 Step 1: Create an account for the contract
 ------------------------------------------
@@ -127,14 +121,12 @@ Each account on NEAR can have at most one contract deployed to it. If you've alr
 
       near create-account crossword.YOUR-NAME.testnet --masterAccount YOUR-NAME.testnet
 
-
 Step 2: set contract name in code
 ---------------------------------
 
 Modify the line in `src/config.js` that sets the account name of the contract. Set it to the account id you used above.
 
     const CONTRACT_NAME = process.env.CONTRACT_NAME || 'crossword.YOUR-NAME.testnet'
-
 
 Step 3: deploy!
 ---------------
@@ -147,7 +139,6 @@ As you can see in `package.json`, this does two things:
 
 1. builds & deploys smart contract to NEAR TestNet
 2. builds & deploys frontend code to GitHub using [gh-pages]. This will only work if the project already has a repository set up on GitHub. Feel free to modify the `deploy` script in `package.json` to deploy elsewhere.
-
 
 Troubleshooting
 ===============

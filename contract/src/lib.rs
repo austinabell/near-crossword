@@ -63,10 +63,10 @@ impl Crossword {
             b"claim_reward".to_vec(),
         );
 
-        /* delete old funciton call key*/
+        /* delete old function call key*/
         Promise::new(env::current_account_id()).delete_key(answer_pk);
     }
-    pub fn claim_reward(&mut self, reciever_acc_id: String, memo: String) {
+    pub fn claim_reward(&mut self, receiver_acc_id: String, memo: String) {
         let signer_pk = env::signer_account_pk();
         /* check to see if signer_pk is in the puzzles keys */
         let puzzle = self
@@ -84,32 +84,32 @@ impl Crossword {
             }
         };
 
-        Promise::new(reciever_acc_id.clone()).transfer(puzzle.reward);
+        Promise::new(receiver_acc_id.clone()).transfer(puzzle.reward);
 
         log!(
-            "Puzzle with pk: {:?} claimed, reciever: {}, memo: {}, reward claimed: {}",
+            "Puzzle with pk: {:?} claimed, receiver: {}, memo: {}, reward claimed: {}",
             signer_pk,
-            reciever_acc_id,
+            receiver_acc_id,
             memo,
             puzzle.reward
         );
 
-        /* delete funciton call key*/
+        /* delete function call key*/
         Promise::new(env::current_account_id()).delete_key(signer_pk);
     }
 
     /* Puzzle creator provides `answer_pk`, it's a pk that can be generated
-    from crossword answer (seed phraze) */
+    from crossword answer (seed phrase) */
     #[payable]
     pub fn new_puzzle(&mut self, answer_pk: Base58PublicKey) {
-        let value_transfered = env::attached_deposit();
+        let value_transferred = env::attached_deposit();
         let creator = env::predecessor_account_id();
         let answer_pk = PublicKey::from(answer_pk);
         let existing = self.puzzles.insert(
             answer_pk.clone(),
             Puzzle {
                 status: PuzzleStatus::Unsolved,
-                reward: value_transfered,
+                reward: value_transferred,
                 creator,
             },
         );
