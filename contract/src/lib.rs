@@ -11,14 +11,14 @@ near_sdk::setup_alloc!();
 #[derive(BorshDeserialize, BorshSerialize)]
 pub enum PuzzleStatus {
     Unsolved,
-    Solved { solver: PublicKey },
+    Solved { solver_pk: PublicKey },
     Claimed { memo: String },
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
 pub struct Puzzle {
     status: PuzzleStatus,
-    value: Balance,
+    reward: Balance,
     creator: AccountId,
 }
 
@@ -30,19 +30,19 @@ pub struct Crossword {
 
 #[near_bindgen]
 impl Crossword {
-    pub fn submit_solution(&mut self, new_public_key: Base58PublicKey) {
-        let solver = env::signer_account_pk();
-        // check to see if the env::public key from signer is in the puzzles
-        // see if it's already solved…
-        let entry = self
+    pub fn submit_solution(&mut self, solver_pk: Base58PublicKey) {
+        let answer_pk = env::signer_account_pk();
+        /* check to see if the answer_pk from signer is in the puzzles */
+        let puzzle = self
             .puzzles
-            .get_mut(&solver)
+            .get_mut(&answer_pk)
             .expect("Not a correct public key to solve puzzle");
 
-        // batch action of removing that public key and adding the user's public key
-        entry.status = match entry.status {
+        /* check if the puzzle is already solved, if it's not solved - make batch action of
+        removing that public key and adding the user's public key */
+        puzzle.status = match puzzle.status {
             PuzzleStatus::Unsolved => PuzzleStatus::Solved {
-                solver: new_public_key.clone().into(),
+                solver_pk: solver_pk.clone().into(),
             },
             _ => {
                 env::panic(b"puzzle is already solved");
@@ -50,34 +50,75 @@ impl Crossword {
         };
 
         log!(
-            "Puzzle solved, new public key: {}",
-            String::from(&new_public_key)
+            "Puzzle with pk {:?} solved, solever pk: {}",
+            answer_pk,
+            String::from(&solver_pk)
         );
-    }
-    
-    // TODO claim reward functionality
 
-    // Puzzle creator provides `key` that's the answer
+        /* add new function call key for claim_reward */
+        Promise::new(env::current_account_id()).add_access_key(
+            solver_pk.into(),
+            250000000000000000000000,
+            env::current_account_id(),
+            b"claim_reward".to_vec(),
+        );
+
+        /* delete old funciton call key*/
+        Promise::new(env::current_account_id()).delete_key(answer_pk);
+    }
+    pub fn claim_reward(&mut self, reciever_acc_id: String, memo: String) {
+        let signer_pk = env::signer_account_pk();
+        /* check to see if signer_pk is in the puzzles keys */
+        let puzzle = self
+            .puzzles
+            .get_mut(&signer_pk)
+            .expect("Not a correct public key to solve puzzle");
+
+        /* check if puzzle is already solved and set `Claimed` status */
+        puzzle.status = match puzzle.status {
+            PuzzleStatus::Solved { solver_pk: _ } => PuzzleStatus::Claimed {
+                memo: memo.clone().into(),
+            },
+            _ => {
+                env::panic(b"puzzle should have `Solved` status to be claimed");
+            }
+        };
+
+        Promise::new(reciever_acc_id.clone()).transfer(puzzle.reward);
+
+        log!(
+            "Puzzle with pk: {:?} claimed, reciever: {}, memo: {}, reward claimed: {}",
+            signer_pk,
+            reciever_acc_id,
+            memo,
+            puzzle.reward
+        );
+
+        /* delete funciton call key*/
+        Promise::new(env::current_account_id()).delete_key(signer_pk);
+    }
+
+    /* Puzzle creator provides `answer_pk`, it's a pk that can be generated
+    from crossword answer (seed phraze) */
     #[payable]
-    pub fn new_puzzle(&mut self, key: Base58PublicKey) {
+    pub fn new_puzzle(&mut self, answer_pk: Base58PublicKey) {
         let value_transfered = env::attached_deposit();
         let creator = env::predecessor_account_id();
-        let key = PublicKey::from(key);
+        let answer_pk = PublicKey::from(answer_pk);
         let existing = self.puzzles.insert(
-            key.clone(),
+            answer_pk.clone(),
             Puzzle {
                 status: PuzzleStatus::Unsolved,
-                value: value_transfered,
+                reward: value_transfered,
                 creator,
             },
         );
 
         assert!(existing.is_none(), "Puzzle with that key already exists");
         Promise::new(env::current_account_id()).add_access_key(
-            key,
+            answer_pk,
             250000000000000000000000,
             env::current_account_id(),
-            // * Strange API for it to be cs names
             b"submit_solution".to_vec(),
         );
     }
