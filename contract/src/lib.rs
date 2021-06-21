@@ -42,6 +42,9 @@ impl Crossword {
         removing that public key and adding the user's public key */
         puzzle.status = match puzzle.status {
             PuzzleStatus::Unsolved => PuzzleStatus::Solved {
+                /*TODO: we should replace the key, not value inside of the puzzle.
+                 Or, as an alternative, iterate in `claim_reward` and check `solver_pk` value.
+                 Or, just have additional `solved_puzzles` map*/
                 solver_pk: solver_pk.clone().into(),
             },
             _ => {
