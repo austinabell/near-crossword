@@ -4,7 +4,7 @@ NEAR Crossword
 How to play with this contract
 ===============================
 1. Clone the repo and build it with `yarn build`
-2. Run `near dev-deploy` to deploy the contract to `testnet`
+2. Run `near dev-deploy` to deploy the contract to `testnet`.
 3. Create a crossword, let's say that the answer to your crossword is "many clever words"
 4. Answer for your crossword from now on will be a seed phrase! Let's generate key pair out of it.
 

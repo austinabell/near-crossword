@@ -42,9 +42,6 @@ impl Crossword {
         removing that public key and adding the user's public key */
         puzzle.status = match puzzle.status {
             PuzzleStatus::Unsolved => PuzzleStatus::Solved {
-                /*TODO: we should replace the key, not value inside of the puzzle.
-                 Or, as an alternative, iterate in `claim_reward` and check `solver_pk` value.
-                 Or, just have additional `solved_puzzles` map*/
                 solver_pk: solver_pk.clone().into(),
             },
             _ => {
@@ -69,12 +66,12 @@ impl Crossword {
         /* delete old function call key*/
         Promise::new(env::current_account_id()).delete_key(answer_pk);
     }
-    pub fn claim_reward(&mut self, receiver_acc_id: String, memo: String) {
+    pub fn claim_reward(&mut self, crossword_pk: Base58PublicKey, receiver_acc_id: String, memo: String) {
         let signer_pk = env::signer_account_pk();
         /* check to see if signer_pk is in the puzzles keys */
         let puzzle = self
             .puzzles
-            .get_mut(&signer_pk)
+            .get_mut(&PublicKey::from(crossword_pk.clone()))
             .expect("Not a correct public key to solve puzzle");
 
         /* check if puzzle is already solved and set `Claimed` status */
@@ -91,7 +88,7 @@ impl Crossword {
 
         log!(
             "Puzzle with pk: {:?} claimed, receiver: {}, memo: {}, reward claimed: {}",
-            signer_pk,
+            crossword_pk,
             receiver_acc_id,
             memo,
             puzzle.reward
