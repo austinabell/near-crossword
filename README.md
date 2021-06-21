@@ -59,10 +59,9 @@ cp ~/.near-credentials/testnet/keyToGetTheReward.testnet.json ~/.near-credential
 And now we can claim our reward:
 
 ```bash
-near call <contract-id> claim_reward '{"receiver_acc_id":"<receiver-acc>", "memo":"Victory!"}' --accountId=<contract-id>
+near call <contract-id> claim_reward '{"receiver_acc_id":"serhii.testnet", "crossword_pk":"<PK from randomAccountId account>", "memo":"Victory!"}' --accountId=<contract-id>
 ```
 
-//TODO: last call gives me `ExecutionError: "Smart contract panicked: panicked at 'Not a correct public key to solve puzzle', src/lib.rs:75:14"`
 
 This [React] app was initialized with [create-near-app]
 
