@@ -50,7 +50,7 @@ near call <contract-id> submit_solution '{"solver_pk":"<PK from keyToGetTheRewar
 
 Puzzle solved! Let's get our reward!
 
-8. To get the reward we need to call `claim_reward` function with the function call key that we have added in the prevoius step. Before that call we should prepare the keys:
+8. To get the reward we need to call the `claim_reward` function with the function call key that we have added in the previous step. Before that call we should prepare the keys:
 
 ```bash
 cp ~/.near-credentials/testnet/keyToGetTheReward.testnet.json ~/.near-credentials/testnet/<contract-id>.json
