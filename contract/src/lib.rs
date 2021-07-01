@@ -71,7 +71,7 @@ impl Crossword {
         /* check to see if signer_pk is in the puzzles keys */
         let puzzle = self
             .puzzles
-            .get_mut(&PublicKey::from(crossword_pk.clone()))
+            .get_mut(&crossword_pk.0)
             .expect("Not a correct public key to solve puzzle");
 
         /* check if puzzle is already solved and set `Claimed` status */
