@@ -27,7 +27,7 @@ How to play with this contract
    
    After this call your puzzle will be added to the NEAR Crossword contract. Share your Crossword with friends, the person who will be able to solve it will be able to generate the same key pair and get the reward. Let's do that in the following steps.
 
-6. Pretend that we have solved the puzzle and generated the very same key pair. This time it should be stored at `~/.near-credentials/testnet/<contract-id>.json`. We are using `<contract-id>` here because in the next step we will need to sign transaction with this acc.
+6. Pretend that we have solved the puzzle and generated the very same key pair. This time it should be stored at `~/.near-credentials/testnet/<contract-id>.json`. We are using `<contract-id>` here because in the next step we will need to sign the transaction with this acc.
 
 Atension! If you are using the same machine, your old key pair from `<dev-acc>` will be owerwriten! Save it in some other place if you need it. Keys are stored in `~/.near-credentials/testnet/` folder.
 
