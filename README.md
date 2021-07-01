@@ -29,7 +29,7 @@ How to play with this contract
 
 6. Pretend that we have solved the puzzle and generated the very same key pair. This time it should be stored at `~/.near-credentials/testnet/<contract-id>.json`. We are using `<contract-id>` here because in the next step we will need to sign the transaction with this acc.
 
-Atension! If you are using the same machine, your old key pair from `<dev-acc>` will be owerwriten! Save it in some other place if you need it. Keys are stored in `~/.near-credentials/testnet/` folder.
+Attention! If you are using the same machine, your old key pair from `<dev-acc>` will be overwritten! Save it in some other place if you need it. Keys are stored in `~/.near-credentials/testnet/` folder.
 
 To generate the new key:
 ```bash
