@@ -4,7 +4,7 @@ use near_sdk::{
 };
 use near_sdk::{env, near_bindgen, PublicKey};
 use near_sdk::{json_types::Base58PublicKey, AccountId};
-use std::collections::HashMap;
+use near_sdk::collections::LookupMap;
 
 near_sdk::setup_alloc!();
 
@@ -23,9 +23,9 @@ pub struct Puzzle {
 }
 
 #[near_bindgen]
-#[derive(Default, BorshDeserialize, BorshSerialize)]
+#[derive(BorshDeserialize, BorshSerialize)]
 pub struct Crossword {
-    puzzles: HashMap<PublicKey, Puzzle>,
+    puzzles: LookupMap<PublicKey, Puzzle>,
 }
 
 #[near_bindgen]
@@ -33,9 +33,9 @@ impl Crossword {
     pub fn submit_solution(&mut self, solver_pk: Base58PublicKey) {
         let answer_pk = env::signer_account_pk();
         /* check to see if the answer_pk from signer is in the puzzles */
-        let puzzle = self
+        let mut puzzle = self
             .puzzles
-            .get_mut(&answer_pk)
+            .get(&answer_pk)
             .expect("Not a correct public key to solve puzzle");
 
         /* check if the puzzle is already solved, if it's not solved - make batch action of
@@ -49,8 +49,11 @@ impl Crossword {
             }
         };
 
+        // Reinsert the puzzle back in after we modified the status:
+        self.puzzles.insert(&answer_pk, &puzzle);
+
         log!(
-            "Puzzle with pk {:?} solved, solever pk: {}",
+            "Puzzle with pk {:?} solved, solver pk: {}",
             answer_pk,
             String::from(&solver_pk)
         );
@@ -66,12 +69,13 @@ impl Crossword {
         /* delete old function call key*/
         Promise::new(env::current_account_id()).delete_key(answer_pk);
     }
+
     pub fn claim_reward(&mut self, crossword_pk: Base58PublicKey, receiver_acc_id: String, memo: String) {
         let signer_pk = env::signer_account_pk();
         /* check to see if signer_pk is in the puzzles keys */
-        let puzzle = self
+        let mut puzzle = self
             .puzzles
-            .get_mut(&crossword_pk.0)
+            .get(&crossword_pk.0)
             .expect("Not a correct public key to solve puzzle");
 
         /* check if puzzle is already solved and set `Claimed` status */
@@ -83,6 +87,9 @@ impl Crossword {
                 env::panic(b"puzzle should have `Solved` status to be claimed");
             }
         };
+
+        // Reinsert the puzzle back in after we modified the status:
+        self.puzzles.insert(&crossword_pk.0, &puzzle);
 
         Promise::new(receiver_acc_id.clone()).transfer(puzzle.reward);
 
@@ -106,8 +113,8 @@ impl Crossword {
         let creator = env::predecessor_account_id();
         let answer_pk = PublicKey::from(answer_pk);
         let existing = self.puzzles.insert(
-            answer_pk.clone(),
-            Puzzle {
+            &answer_pk,
+            &Puzzle {
                 status: PuzzleStatus::Unsolved,
                 reward: value_transferred,
                 creator,
@@ -121,6 +128,12 @@ impl Crossword {
             env::current_account_id(),
             b"submit_solution".to_vec(),
         );
+    }
+}
+
+impl Default for Crossword {
+    fn default() -> Self {
+        Self { puzzles: LookupMap::new(b"c") }
     }
 }
 
