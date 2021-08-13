@@ -22,7 +22,8 @@ near call $NEAR_ACCT new_puzzle '{
        "y": 2
      },
      "direction": "Across",
-     "length": 8
+     "length": 8,
+     "clue": "clue for sharding"
    },
    {
      "num": 1,
@@ -31,7 +32,8 @@ near call $NEAR_ACCT new_puzzle '{
        "y": 2
      },
      "direction": "Down",
-     "length": 10
+     "length": 10,
+     "clue": "clue for subaccount"
    },
    {
      "num": 2,
@@ -40,7 +42,8 @@ near call $NEAR_ACCT new_puzzle '{
        "y": 7
      },
      "direction": "Across",
-     "length": 9
+     "length": 9,
+     "clue": "clue for accesskey"
    },
    {
      "num": 3,
@@ -49,7 +52,8 @@ near call $NEAR_ACCT new_puzzle '{
        "y": 4
      },
      "direction": "Down",
-     "length": 7
+     "length": 7,
+     "clue": "clue for indexer"
    },
    {
      "num": 4,
@@ -58,7 +62,8 @@ near call $NEAR_ACCT new_puzzle '{
        "y": 5
      },
      "direction": "Across",
-     "length": 11
+     "length": 11,
+     "clue": "clue for nonfungible"
    },
    {
      "num": 5,
@@ -67,7 +72,8 @@ near call $NEAR_ACCT new_puzzle '{
        "y": 10
      },
      "direction": "Across",
-     "length": 3
+     "length": 3,
+     "clue": "clue for rpc"
    },
    {
      "num": 6,
@@ -76,7 +82,8 @@ near call $NEAR_ACCT new_puzzle '{
        "y": 1
      },
      "direction": "Down",
-     "length": 10
+     "length": 10,
+     "clue": "clue for simulation"
    },
    {
      "num": 7,
@@ -85,7 +92,8 @@ near call $NEAR_ACCT new_puzzle '{
        "y": 2
      },
      "direction": "Across",
-     "length": 4
+     "length": 4,
+     "clue": "clue for init"
    },
    {
      "num": 8,
@@ -94,7 +102,8 @@ near call $NEAR_ACCT new_puzzle '{
        "y": 8
      },
      "direction": "Across",
-     "length": 4
+     "length": 4,
+     "clue": "clue for defi"
    },
    {
      "num": 8,
@@ -103,7 +112,8 @@ near call $NEAR_ACCT new_puzzle '{
        "y": 8
      },
      "direction": "Down",
-     "length": 3
+     "length": 3,
+     "clue": "clue for dao"
    }
   ]
 }' --accountId mike.testnet
