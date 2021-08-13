@@ -63,7 +63,6 @@ pub struct Crossword {
 impl Crossword {
     pub fn submit_solution(&mut self, solver_pk: Base58PublicKey) {
         let answer_pk = env::signer_account_pk();
-        log!("aloha you gave me this pk: {:?}", answer_pk);
         // check to see if the answer_pk from signer is in the puzzles
         let mut puzzle = self
             .puzzles
