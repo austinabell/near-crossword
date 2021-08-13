@@ -1,6 +1,6 @@
 use crate::*;
 
-use near_sdk::{env, near_bindgen, PublicKey};
+use near_sdk::{near_bindgen, PublicKey};
 use near_sdk::json_types::Base58PublicKey;
 use near_sdk::log;
 
