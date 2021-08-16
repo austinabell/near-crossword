@@ -9,7 +9,7 @@ near deploy $NEAR_ACCT --wasmFile /Users/mike/near/near-crossword/contract/res/c
 echo "Keys before:"
 near keys $NEAR_ACCT
 near call $NEAR_ACCT new_puzzle '{
-  "answer_pk": "ed25519:psA2GvARwAbsAZXPs6c6mLLZppK1j1YcspGY2gqq72a",
+  "answer_pk": "ed25519:CpqWpFLps6zNNXSwn9ZYgvTgSVQ598fn1kWXgjcA2uLp",
   "dimensions": {
    "x": 19,
    "y": 13
@@ -120,4 +120,4 @@ near call $NEAR_ACCT new_puzzle '{
 
 echo "Keys after"
 near keys $NEAR_ACCT
-near view $NEAR_ACCT debug_get_puzzle '{"pk": "ed25519:psA2GvARwAbsAZXPs6c6mLLZppK1j1YcspGY2gqq72a"}'
+near view $NEAR_ACCT debug_get_puzzle '{"pk": "ed25519:CpqWpFLps6zNNXSwn9ZYgvTgSVQ598fn1kWXgjcA2uLp"}'
