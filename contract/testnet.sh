@@ -120,4 +120,5 @@ near call $NEAR_ACCT new_puzzle '{
 
 echo "Keys after"
 near keys $NEAR_ACCT
+near view $NEAR_ACCT get_unsolved_puzzles
 near view $NEAR_ACCT debug_get_puzzle '{"pk": "ed25519:CpqWpFLps6zNNXSwn9ZYgvTgSVQ598fn1kWXgjcA2uLp"}'
